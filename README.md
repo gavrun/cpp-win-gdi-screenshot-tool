@@ -1,0 +1,1 @@
+# cpp-win-gdi-screenshot-tool
