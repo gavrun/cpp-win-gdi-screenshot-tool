@@ -10,6 +10,7 @@
 #include "ConfigManager.h"
 #include "CaptureEngine.h"
 #include "FileManager.h"
+#include "OverlayWindow.h"
 
 #include <windows.h>
 #include <string>
@@ -49,9 +50,24 @@ public:
         // ID 1 Full-screen
         RegisterHotKey(hwnd, 1, MOD_WIN | MOD_SHIFT, 'Q');
         // ID 2 Region capture
-        RegisterHotKey(hwnd, 2, MOD_WIN | MOD_SHIFT, 'A');
+        RegisterHotKey(hwnd, 2, MOD_WIN | MOD_SHIFT, 'Z');
 
         // Note: Silent fail if registration conflicts
+
+        // DEBUG
+        //BOOL fullOK = RegisterHotKey(hwnd, 1, MOD_WIN | MOD_SHIFT, 'Q');
+        //if (!fullOK) {
+        //    MessageBoxW(NULL, L"Full-screen hotkey registration failed", L"Debug", MB_OK);
+        //}
+        // DEBUG
+        //BOOL regionOK = RegisterHotKey(hwnd, 2, MOD_WIN | MOD_SHIFT, 'A');
+        //if (!regionOK) {
+        //    MessageBoxW(NULL, L"Region hotkey registration failed", L"Debug", MB_OK);
+        //}
+        //BOOL regionOK = RegisterHotKey(hwnd, 2, MOD_WIN | MOD_SHIFT, 'Z');
+        //if (!regionOK) {
+        //    MessageBoxW(NULL, L"Region hotkey registration failed", L"Debug", MB_OK);
+        //}
     }
 };
 
@@ -258,8 +274,37 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam) {
         }
         else if (wParam == 2) {
             // RegionCapture hotkey pressed
+            HBITMAP frozen = CaptureEngine::CaptureFull();
+            RECT sel;
             
-            // TO BE DONE
+            // DEBUG
+            //MessageBoxW(NULL, L"Hotkey hit!", L"Debug", MB_OK);
+
+            bool wasAborted = false;
+            
+            OverlayWindow ow;
+            bool owOk = ow.Show(frozen, sel, wasAborted);
+            // DEBUG
+            OutputDebugString(owOk ? L"[DEBUG] Overlay Show returned true\n"
+                                   : L"[DEBUG] Overlay Show returned false\n");
+
+            if (owOk && !wasAborted) {
+                OutputDebugString(L"[DEBUG] Cropping region\n");
+                HBITMAP cropped = CaptureEngine::CaptureRegion(sel, frozen);
+                if (cropped) {
+                    OutputDebugString(L"[DEBUG] Cropped, now saving file\n");
+                    std::wstring fn = GenerateTimestampedFilename(config.outputFolder);
+                    FileManager::SavePng(cropped, fn);
+                    DeleteObject(cropped);
+                }
+                else {
+                    OutputDebugString(L"[DEBUG] Crop returned null bitmap\n");
+                }
+            }
+            else {
+                OutputDebugString(L"[DEBUG] Skipping crop (aborted or owOk was false)\n");
+            }
+            DeleteObject(frozen);
         }
     }
     return DefWindowProc(hwnd, msg, wParam, lParam);

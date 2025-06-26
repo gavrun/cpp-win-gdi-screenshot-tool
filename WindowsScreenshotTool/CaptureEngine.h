@@ -16,4 +16,7 @@ public:
 	static HBITMAP CaptureFull();
 
 	// Caller is responsible for DeleteObject(bitmap)
+
+	static HBITMAP CaptureRegion(const RECT& rect, HBITMAP sourceBmp);
 };
+
