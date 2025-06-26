@@ -63,3 +63,4 @@ HBITMAP CaptureEngine::CaptureRegion(const RECT& rect, HBITMAP sourceBmp) {
 
     return targetBmp;
 }
+

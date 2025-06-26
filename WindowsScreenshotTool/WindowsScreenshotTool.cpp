@@ -1,16 +1,16 @@
 // WindowsScreenshotTool.cpp : Defines the entry point for the application.
 //
-// Windows Screenshot Tool - Phase 1 Skeleton
-// Pure Win32/GDI version
+// Windows Screenshot Tool - native Win32/GDI+ version
 
 
 //#include "framework.h"
 #include "WindowsScreenshotTool.h"
 
 #include "ConfigManager.h"
+#include "HotkeyListener.h"
+#include "OverlayWindow.h"
 #include "CaptureEngine.h"
 #include "FileManager.h"
-#include "OverlayWindow.h"
 
 #include <windows.h>
 #include <string>
@@ -42,37 +42,7 @@ LRESULT CALLBACK    WndProc(HWND, UINT, WPARAM, LPARAM);
 ConfigManager config;
 
 
-// ----------------- HotkeyListener -----------------
-// HotkeyListener registers global hotkeys via Win32 RegisterHotKey
-class HotkeyListener {
-public:
-    void Register(HWND hwnd) {
-        // ID 1 Full-screen
-        RegisterHotKey(hwnd, 1, MOD_WIN | MOD_SHIFT, 'Q');
-        // ID 2 Region capture
-        RegisterHotKey(hwnd, 2, MOD_WIN | MOD_SHIFT, 'Z');
-
-        // Note: Silent fail if registration conflicts
-
-        // DEBUG
-        //BOOL fullOK = RegisterHotKey(hwnd, 1, MOD_WIN | MOD_SHIFT, 'Q');
-        //if (!fullOK) {
-        //    MessageBoxW(NULL, L"Full-screen hotkey registration failed", L"Debug", MB_OK);
-        //}
-        // DEBUG
-        //BOOL regionOK = RegisterHotKey(hwnd, 2, MOD_WIN | MOD_SHIFT, 'A');
-        //if (!regionOK) {
-        //    MessageBoxW(NULL, L"Region hotkey registration failed", L"Debug", MB_OK);
-        //}
-        //BOOL regionOK = RegisterHotKey(hwnd, 2, MOD_WIN | MOD_SHIFT, 'Z');
-        //if (!regionOK) {
-        //    MessageBoxW(NULL, L"Region hotkey registration failed", L"Debug", MB_OK);
-        //}
-    }
-};
-
-
-// ----------------- WinMain TEMPLATE -----------------
+// WinMain TEMPLATE 
 //int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 //                     _In_opt_ HINSTANCE hPrevInstance,
 //                     _In_ LPWSTR    lpCmdLine,
@@ -81,7 +51,7 @@ public:
 //    UNREFERENCED_PARAMETER(hPrevInstance);
 //    UNREFERENCED_PARAMETER(lpCmdLine);
 //
-//    // TODO: Place code here.
+//    // TODO: Place code here
 //
 //    // Initialize global strings
 //    LoadStringW(hInstance, IDS_APP_TITLE, szTitle, MAX_LOADSTRING);
@@ -112,7 +82,6 @@ public:
 //}
 
 
-// ----------------- WinMain & Message Loop -----------------
 // Entry point for Windows GUI app using wide-character strings
 int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE, PWSTR, int) {
     
@@ -141,7 +110,9 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE, PWSTR, int) {
 
     // Register global hotkeys
     HotkeyListener hotkeys;
-    hotkeys.Register(hwnd);
+    //hotkeys.Register(hwnd);
+    hotkeys.Register(hwnd, config.fullHotkey, config.regionHotkey);
+
 
     // Main message loop
     MSG msg = {};
@@ -157,10 +128,9 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE, PWSTR, int) {
 }
 
 
-//
 //  FUNCTION: MyRegisterClass()
 //
-//  PURPOSE: Registers the window class.
+//  PURPOSE: Registers the window class
 //
 //ATOM MyRegisterClass(HINSTANCE hInstance)
 //{
@@ -183,7 +153,7 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE, PWSTR, int) {
 //    return RegisterClassExW(&wcex);
 //}
 
-//
+
 //   FUNCTION: InitInstance(HINSTANCE, int)
 //
 //   PURPOSE: Saves instance handle and creates main window
@@ -191,7 +161,7 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE, PWSTR, int) {
 //   COMMENTS:
 //
 //        In this function, we save the instance handle in a global variable and
-//        create and display the main program window.
+//        create and display the main program window
 //
 //BOOL InitInstance(HINSTANCE hInstance, int nCmdShow)
 //{
@@ -211,7 +181,7 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE, PWSTR, int) {
 //   return TRUE;
 //}
 
-//
+
 //  FUNCTION: WndProc(HWND, UINT, WPARAM, LPARAM)
 //
 //  PURPOSE: Processes messages for the main window.
@@ -219,8 +189,7 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE, PWSTR, int) {
 //  WM_COMMAND  - process the application menu
 //  WM_PAINT    - Paint the main window
 //  WM_DESTROY  - post a quit message and return
-//
-//
+
 
 //LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 //{
@@ -260,9 +229,8 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE, PWSTR, int) {
 //    return 0;
 //}
 
-// ----------------- WndProc -----------------
-// Main window message handler
-// - Responds to WM_HOTKEY only (no visible window UI)
+
+// Main window message handler responds to WM_HOTKEY (no visible UI window)
 LRESULT CALLBACK WndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam) {
     if (msg == WM_HOTKEY) {
         if (wParam == 1) {
@@ -311,7 +279,7 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam) {
 }
 
 
-// Message handler for about box.
+// Message handler for about box
 //INT_PTR CALLBACK About(HWND hDlg, UINT message, WPARAM wParam, LPARAM lParam)
 //{
 //    UNREFERENCED_PARAMETER(lParam);

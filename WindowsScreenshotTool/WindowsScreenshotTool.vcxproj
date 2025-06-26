@@ -127,6 +127,7 @@
     <ClInclude Include="ConfigManager.h" />
     <ClInclude Include="FileManager.h" />
     <ClInclude Include="framework.h" />
+    <ClInclude Include="HotkeyListener.h" />
     <ClInclude Include="OverlayWindow.h" />
     <ClInclude Include="Resource.h" />
     <ClInclude Include="targetver.h" />
@@ -136,6 +137,7 @@
     <ClCompile Include="CaptureEngine.cpp" />
     <ClCompile Include="ConfigManager.cpp" />
     <ClCompile Include="FileManager.cpp" />
+    <ClCompile Include="HotkeyListener.cpp" />
     <ClCompile Include="OverlayWindow.cpp" />
     <ClCompile Include="WindowsScreenshotTool.cpp" />
   </ItemGroup>
